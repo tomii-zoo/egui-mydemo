@@ -1,10 +1,4 @@
-// #![cfg_attr(not(debug_assertions), windows_subsystem = "windows")] // hide console window on Windows in release
-// #![allow(rustdoc::missing_crate_level_docs)] // it's an example
-
 use eframe::egui;
-
-use std::fs::File;
-use std::io::{Write};
 
 fn main() -> eframe::Result {
     env_logger::init(); // Log to stderr (if you run with `RUST_LOG=debug`).
@@ -15,9 +9,7 @@ fn main() -> eframe::Result {
         ..Default::default()
     };
 
-    // Our application state:
-    let mut output_path = "./output";
-    let mut input_path = "https://example.com".to_owned();
+    let mut url_text = "https://example.com".to_owned();
     let mut res_text = "".to_owned();
 
     eframe::run_simple_native("My egui App", options, move |ctx, _frame| {
@@ -27,30 +19,17 @@ fn main() -> eframe::Result {
             ui.separator();
 
             ui.label("URL");
-            ui.text_edit_singleline(&mut input_path);
+            ui.text_edit_singleline(&mut url_text);
 
             ui.label("Response");
-
             egui::ScrollArea::vertical().show(ui, |ui| {
                 ui.text_edit_multiline(&mut res_text);
                 
                 if ui.button("GET").clicked() {
-                    let url = "https://example.com";
-                    let res = reqwest::blocking::get(url).unwrap();
+                    let res = reqwest::blocking::get(&url_text).unwrap();
                     res_text = res.text().unwrap();
                 }
             });
         });
     })
 }
-
-// fn input_file() {
-//     let mut f = File::open("test.txt").expect("file not found");
-// }
-
-// fn output_file() -> std::io::Result<()> {
-//     let mut file = File::create("test.txt")?;
-//     file.write_all("test".as_bytes())?;
-//     println!("completed.");
-//     Ok(())
-// }
